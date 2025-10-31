@@ -24,7 +24,6 @@ type ConstructArgs = {
   noFollow?: boolean;
 };
 
-
 const DEFAULT_AUTHOR: AuthorInfo = {
   name: "Roman Bolshiyanov",
   email: "roman@aifa.dev",
@@ -38,23 +37,24 @@ const DEFAULT_AUTHOR: AuthorInfo = {
   ],
 };
 
-
 const DEFAULT_CREATOR = "aifa.dev";
-
 
 const MAX_DESCRIPTION_LENGTH = 160;
 
+// FIXED: Properly typed icon structure
+type IconConfig = {
+  url: string;
+  rel?: string;
+  sizes?: string;
+  type?: string;
+};
+
 const CACHED_ICONS = (() => {
-  const icons: Array<{
-    url: string;
-    rel?: string;
-    sizes?: string;
-    type?: string;
-  }> = [];
+  const icons: IconConfig[] = [];
 
   // Favicon (any size)
   const faviconAny = appConfig.icons?.faviconAny;
-  if (faviconAny && typeof faviconAny === 'string' && faviconAny.length > 0) {
+  if (faviconAny && typeof faviconAny === "string" && faviconAny.length > 0) {
     icons.push({
       url: faviconAny,
       rel: "icon",
@@ -64,7 +64,7 @@ const CACHED_ICONS = (() => {
   }
 
   const icon32 = appConfig.icons?.icon32;
-  if (icon32 && typeof icon32 === 'string' && icon32.length > 0) {
+  if (icon32 && typeof icon32 === "string" && icon32.length > 0) {
     icons.push({
       url: icon32,
       type: "image/png",
@@ -74,7 +74,7 @@ const CACHED_ICONS = (() => {
   }
 
   const icon48 = appConfig.icons?.icon48;
-  if (icon48 && typeof icon48 === 'string' && icon48.length > 0) {
+  if (icon48 && typeof icon48 === "string" && icon48.length > 0) {
     icons.push({
       url: icon48,
       type: "image/png",
@@ -84,7 +84,7 @@ const CACHED_ICONS = (() => {
   }
 
   const icon192 = appConfig.icons?.icon192;
-  if (icon192 && typeof icon192 === 'string' && icon192.length > 0) {
+  if (icon192 && typeof icon192 === "string" && icon192.length > 0) {
     icons.push({
       url: icon192,
       type: "image/png",
@@ -94,7 +94,7 @@ const CACHED_ICONS = (() => {
   }
 
   const icon512 = appConfig.icons?.icon512;
-  if (icon512 && typeof icon512 === 'string' && icon512.length > 0) {
+  if (icon512 && typeof icon512 === "string" && icon512.length > 0) {
     icons.push({
       url: icon512,
       type: "image/png",
@@ -104,7 +104,7 @@ const CACHED_ICONS = (() => {
   }
 
   const appleTouch = appConfig.icons?.appleTouch;
-  if (appleTouch && typeof appleTouch === 'string' && appleTouch.length > 0) {
+  if (appleTouch && typeof appleTouch === "string" && appleTouch.length > 0) {
     icons.push({
       url: appleTouch,
       rel: "apple-touch-icon",
@@ -124,14 +124,19 @@ function normalizePath(p?: string): string {
   return s;
 }
 
-function truncateDescription(desc: string, maxLength: number = MAX_DESCRIPTION_LENGTH): string {
+function truncateDescription(
+  desc: string,
+  maxLength: number = MAX_DESCRIPTION_LENGTH
+): string {
   if (desc.length <= maxLength) return desc;
   return desc.substring(0, maxLength - 3) + "...";
 }
 
+// FIXED: Properly typed schema objects instead of 'any'
+type JsonLdSchema = Record<string, unknown>;
 
-function buildPersonSchema(author: AuthorInfo): object {
-  const person: any = {
+function buildPersonSchema(author: AuthorInfo): JsonLdSchema {
+  const person: JsonLdSchema = {
     "@type": "Person",
     name: author.name,
   };
@@ -152,7 +157,6 @@ function buildPersonSchema(author: AuthorInfo): object {
 
   return person;
 }
-
 
 export function constructMetadata({
   title = appConfig.name,
@@ -175,9 +179,7 @@ export function constructMetadata({
     alternates: { canonical },
     manifest: "/manifest.webmanifest",
     icons: CACHED_ICONS,
-    authors: [
-      { name: DEFAULT_AUTHOR.name, url: DEFAULT_AUTHOR.url },
-    ],
+    authors: [{ name: DEFAULT_AUTHOR.name, url: DEFAULT_AUTHOR.url }],
     creator: DEFAULT_CREATOR,
     publisher: DEFAULT_CREATOR,
     openGraph: {
@@ -226,7 +228,8 @@ export function buildArticleSchema({
   author: AuthorInfo | AuthorInfo[];
   image?: string;
   description?: string;
-}): object {
+}): JsonLdSchema {
+  // FIXED: Properly typed author schema
   const authorSchema = Array.isArray(author)
     ? author.map((a) => buildPersonSchema(a))
     : buildPersonSchema(author);
@@ -258,7 +261,7 @@ export function buildArticleSchema({
 
 export function buildFAQSchema(
   faqs: Array<{ question: string; answer: string }>
-): object {
+): JsonLdSchema {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -272,7 +275,6 @@ export function buildFAQSchema(
     })),
   };
 }
-
 
 export function buildProductSchema({
   name,
@@ -292,7 +294,7 @@ export function buildProductSchema({
   reviewCount?: number;
   image?: string;
   brand?: string;
-}): object {
+}): JsonLdSchema {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -319,7 +321,7 @@ export function buildProductSchema({
 
 export function buildBreadcrumbSchema(
   breadcrumbs: Array<{ name: string; url: string }>
-): object {
+): JsonLdSchema {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",

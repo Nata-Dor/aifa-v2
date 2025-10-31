@@ -1,9 +1,9 @@
-import Link from "next/link";
-import { headers } from "next/headers";
+// aifa-v2/app/not-found.tsx
 
-export default async function NotFound() {
-  const headersList = await headers();
-  const domain = headersList.get("host");
+import Link from "next/link";
+
+export default function NotFound() {
+  
   return (
     <div>
       <h2>Not Found</h2>

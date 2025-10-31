@@ -7,7 +7,8 @@ import { contentData } from "@/config/content/content-data";
 import { PageData } from "@/types/page-types";
 
 export const dynamic = "force-dynamic"; // for debugging freshness; switch back to "force-static" later
-export const revalidate = 300; 
+export const revalidate = 300;
+
 function isValidHref(href?: string): href is string {
   return typeof href === "string" && href.startsWith("/");
 }
@@ -32,42 +33,58 @@ function isIndexablePage(p: PageData, disallow: string[]): boolean {
   return roleOk && publishedOk && hrefOk && notBlocked;
 }
 
-// NEW: robust extractor with nested support
+// FIXED: Properly typed CatNode without any
 type CatNode = {
   pages?: PageData[];
   items?: PageData[];
   entries?: PageData[];
   children?: CatNode[];
   sections?: CatNode[];
-  [k: string]: any;
 };
 
+// FIXED: Extract pages with proper type checking instead of 'any'
 function extractAllPages(nodes: CatNode[] | undefined): PageData[] {
   if (!Array.isArray(nodes)) return [];
   const out: PageData[] = [];
+  
   for (const node of nodes) {
-    const pageArrays = [
-      Array.isArray(node.pages) ? (node.pages as PageData[]) : [],
-      Array.isArray(node.items) ? (node.items as PageData[]) : [],
-      Array.isArray(node.entries) ? (node.entries as PageData[]) : [],
+    // Safely extract page arrays with type narrowing
+    const pageArrays: PageData[][] = [
+      node.pages ?? [],
+      node.items ?? [],
+      node.entries ?? [],
     ];
-    for (const arr of pageArrays) out.push(...arr);
+    
+    for (const arr of pageArrays) {
+      out.push(...arr);
+    }
 
-    const nextLevels = [
-      Array.isArray(node.children) ? (node.children as CatNode[]) : [],
-      Array.isArray(node.sections) ? (node.sections as CatNode[]) : [],
+    // Safely extract nested nodes with type narrowing
+    const nextLevels: CatNode[][] = [
+      node.children ?? [],
+      node.sections ?? [],
     ];
-    for (const next of nextLevels) out.push(...extractAllPages(next));
+    
+    for (const next of nextLevels) {
+      out.push(...extractAllPages(next));
+    }
   }
+  
   return out;
 }
+
+// FIXED: Define proper type for contentData or cast more safely
+type ContentDataType = {
+  categories?: CatNode[];
+};
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const disallow = appConfig.seo.disallowPaths ?? [];
 
-  const allPages: PageData[] = extractAllPages((contentData as any).categories);
+  // FIXED: Type assertion with proper type definition instead of plain 'any'
+  const typedContentData = contentData as ContentDataType;
+  const allPages: PageData[] = extractAllPages(typedContentData.categories);
 
-  
   const indexable = allPages.filter((p) => isIndexablePage(p, disallow));
 
   const items: MetadataRoute.Sitemap = indexable.map((p) => ({
