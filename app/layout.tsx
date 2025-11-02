@@ -142,26 +142,24 @@ export default function RootLayout({
           }}
           strategy="beforeInteractive"
         />
-<PWAInstallPrompt 
-          position="bottom"
-          dismissDuration={86400000} // 24 hours
-          showBadge={true}
-        />
+<PWAInstallPrompt />
         {children}
 
         {/* Fallback for users with JavaScript disabled */}
         <noscript>
-          <div style={{
-            padding: '20px',
-            backgroundColor: '#fff3cd',
-            borderRadius: '4px',
-            marginTop: '20px',
-            color: '#856404',
-            textAlign: 'center',
-          }}>
-            <strong>JavaScript отключен</strong>
-            <p>Основной контент работает, но некоторые функции могут быть ограничены.</p>
-            <p>Рекомендуем включить JavaScript для лучшего опыта.</p>
+          <div
+            style={{
+              padding: '20px',
+              backgroundColor: '#fff3cd',
+              borderRadius: '4px',
+              marginTop: '20px',
+              color: '#856404',
+              textAlign: 'center',
+            }}
+          >
+            <strong>JavaScript is disabled</strong>
+            <p>Core content is available, but some features may be limited.</p>
+            <p>We recommend enabling JavaScript for the best experience.</p>
           </div>
         </noscript>
       </body>

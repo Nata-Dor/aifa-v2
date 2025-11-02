@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { X, Download, Bell } from 'lucide-react';
 import { appConfig } from '@/config/app-config';
+import { getCSSVariable } from '@/lib/theme-colors';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -10,24 +11,23 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 interface PWAInstallPromptProps {
-  position?: 'top' | 'bottom' | 'corner';
   dismissDuration?: number; // milliseconds to hide after dismiss
-  showBadge?: boolean;
 }
 
-export function PWAInstallPrompt({
-  position = 'bottom',
-  dismissDuration = 86400000, // 24 hours
-  showBadge = true,
-}: PWAInstallPromptProps) {
+export function PWAInstallPrompt({ dismissDuration = 86400000 }: PWAInstallPromptProps) {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
-  const [showBadgeIcon, setShowBadgeIcon] = useState(showBadge);
+  const [showBadge, setShowBadge] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
+  const [primaryColor, setPrimaryColor] = useState('#3b82f6');
 
   useEffect(() => {
+    // Set primary color from CSS variables
+    const color = getCSSVariable('primary');
+    setPrimaryColor(color);
+
     // Detect platform
     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
     const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent);
@@ -57,8 +57,7 @@ export function PWAInstallPrompt({
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowPrompt(true);
-      setShowBadgeIcon(true);
+      setShowBadge(true); // Show badge instead of full prompt
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -68,7 +67,7 @@ export function PWAInstallPrompt({
       console.log('[PWA] App installed successfully');
       setIsInstalled(true);
       setShowPrompt(false);
-      setShowBadgeIcon(false);
+      setShowBadge(false);
       localStorage.removeItem('pwa-install-dismissed');
     };
 
@@ -80,6 +79,7 @@ export function PWAInstallPrompt({
       if (e.matches) {
         setIsInstalled(true);
         setShowPrompt(false);
+        setShowBadge(false);
       }
     };
 
@@ -92,26 +92,26 @@ export function PWAInstallPrompt({
     };
   }, [dismissDuration]);
 
+  const handleBadgeClick = () => {
+    setShowPrompt(true);
+  };
+
   const handleInstall = async () => {
     if (!deferredPrompt) return;
 
     try {
-      // Show the install prompt
       await deferredPrompt.prompt();
-
-      // Wait for user choice
       const { outcome } = await deferredPrompt.userChoice;
 
       if (outcome === 'accepted') {
         console.log('[PWA] Installation accepted');
         setShowPrompt(false);
-        setShowBadgeIcon(false);
+        setShowBadge(false);
       } else {
         console.log('[PWA] Installation dismissed by user');
         handleDismiss();
       }
 
-      // Clear the deferred prompt
       setDeferredPrompt(null);
     } catch (error) {
       console.error('[PWA] Installation failed:', error);
@@ -120,14 +120,10 @@ export function PWAInstallPrompt({
 
   const handleDismiss = () => {
     setShowPrompt(false);
-
-    // Store dismiss timestamp
     localStorage.setItem('pwa-install-dismissed', Date.now().toString());
   };
 
   const handleIOSInstall = () => {
-    // iOS doesn't support beforeinstallprompt
-    // Show instructions instead
     alert(
       `To install ${appConfig.name}:\n\n1. Tap the Share button\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"`
     );
@@ -138,184 +134,151 @@ export function PWAInstallPrompt({
     return null;
   }
 
-  // Show iOS instructions
-  if (isIOS && showPrompt) {
-    return (
-      <PWAInstallPromptUI
-        position={position}
-        onInstall={handleIOSInstall}
-        onDismiss={handleDismiss}
-        isMobile={true}
-        isIOS={true}
-        showBadge={showBadgeIcon}
-      />
-    );
-  }
-
-  // Only show for Android or desktop
-  if (!deferredPrompt || !showPrompt) {
-    return showBadgeIcon ? <PWABadge /> : null;
-  }
-
-  return (
-    <PWAInstallPromptUI
-      position={position}
-      onInstall={handleInstall}
-      onDismiss={handleDismiss}
-      isMobile={isAndroid}
-      showBadge={showBadgeIcon}
-    />
-  );
-}
-
-interface PWAInstallPromptUIProps {
-  position: 'top' | 'bottom' | 'corner';
-  onInstall: () => void;
-  onDismiss: () => void;
-  isMobile?: boolean;
-  isIOS?: boolean;
-  showBadge?: boolean;
-}
-
-function PWAInstallPromptUI({
-  position,
-  onInstall,
-  onDismiss,
-  isMobile = false,
-  isIOS = false,
-  showBadge = true,
-}: PWAInstallPromptUIProps) {
-  const positionClasses = {
-    top: 'top-4',
-    bottom: 'bottom-4',
-    corner: 'bottom-4 right-4',
-  };
-
-  const horizontalClass = position === 'corner' ? 'right-4' : 'left-4 right-4';
-
   return (
     <>
-      {/* Badge Indicator */}
-      {showBadge && <PWABadge />}
+      {/* Badge - Non-intrusive trigger button */}
+      {showBadge && !showPrompt && (
+        <button
+          onClick={handleBadgeClick}
+          className={`
+            fixed bottom-6 right-6 z-40
+            w-14 h-14 rounded-full
+            flex items-center justify-center
+            shadow-lg cursor-pointer
+            transition-all duration-300
+            hover:scale-110 active:scale-95
+            focus:outline-none focus:ring-2 focus:ring-offset-2
+            animate-pulse hover:animate-none
+          `}
+          style={{
+            backgroundColor: primaryColor,
+            color: 'white',
+            boxShadow: `0 4px 12px rgba(0, 0, 0, 0.15)`,
+          }}
+          role="button"
+          aria-label="Install app"
+          title="Install app"
+        >
+          <Download className="w-6 h-6" />
+        </button>
+      )}
 
-      {/* Main Prompt */}
-      <div
-        className={`
-          fixed ${positionClasses[position]} ${horizontalClass} 
-          z-50 animate-in slide-in-from-bottom-4 
-          max-w-sm sm:max-w-md
-        `}
-        role="dialog"
-        aria-labelledby="pwa-install-title"
-        aria-describedby="pwa-install-description"
-      >
-        <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
-            <div className="flex items-center gap-3 mb-2">
-              <Download className="w-5 h-5 text-white" />
-              <h2 id="pwa-install-title" className="text-lg font-semibold text-white">
-                {isIOS ? 'Add to Home Screen' : `Install ${appConfig.short_name}`}
-              </h2>
-            </div>
-            <p id="pwa-install-description" className="text-sm text-blue-50">
-              {isIOS
-                ? 'Get quick access to the app from your home screen'
-                : `Get ${appConfig.short_name} on your device for offline access`}
-            </p>
-          </div>
+      {/* Full Install Prompt - Shows on badge click */}
+      {showPrompt && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/20 z-40 animate-fade-in"
+            onClick={handleDismiss}
+            aria-hidden="true"
+          />
 
-          {/* Content */}
-          <div className="px-6 py-4">
-            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-              <li className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-green-500 flex-shrink-0" />
-                Offline support
-              </li>
-              <li className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-green-500 flex-shrink-0" />
-                App-like experience
-              </li>
-              <li className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-green-500 flex-shrink-0" />
-                Push notifications
-              </li>
-            </ul>
-          </div>
-
-          {/* Actions */}
-          <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800 flex gap-3">
-            <button
-              onClick={onDismiss}
-              className={`
-                flex-1 px-4 py-2 rounded-md font-medium transition-colors
-                text-slate-700 dark:text-slate-300
-                hover:bg-slate-200 dark:hover:bg-slate-700
-                focus:outline-none focus:ring-2 focus:ring-offset-2 
-                focus:ring-blue-500 dark:focus:ring-offset-slate-900
-              `}
-              aria-label="Dismiss installation prompt"
-            >
-              Not now
-            </button>
-            <button
-              onClick={onInstall}
-              className={`
-                flex-1 px-4 py-2 rounded-md font-medium transition-all
-                bg-blue-500 hover:bg-blue-600 text-white
-                focus:outline-none focus:ring-2 focus:ring-offset-2 
-                focus:ring-blue-500 dark:focus:ring-offset-slate-900
-                active:scale-95
-              `}
-              aria-label={isIOS ? 'Add to Home Screen' : 'Install app'}
-            >
-              {isIOS ? 'Add' : 'Install'}
-            </button>
-          </div>
-
-          {/* Close Button */}
-          <button
-            onClick={onDismiss}
+          {/* Prompt Container */}
+          <div
             className={`
-              absolute top-3 right-3
-              p-1 rounded-md text-slate-400 hover:text-slate-600
-              dark:hover:text-slate-300 transition-colors
-              focus:outline-none focus:ring-2 focus:ring-blue-500
+              fixed bottom-6 right-6 z-50
+              max-w-sm w-full
+              animate-in slide-in-from-bottom-4
+              sm:max-w-md
             `}
-            aria-label="Close installation prompt"
+            role="dialog"
+            aria-labelledby="pwa-install-title"
+            aria-describedby="pwa-install-description"
           >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+            <div
+              className="bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+              style={{
+                borderTopColor: primaryColor,
+                borderTopWidth: '3px',
+              }}
+            >
+              {/* Header */}
+              <div
+                className="px-6 py-4 text-white"
+                style={{ backgroundColor: primaryColor }}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <Download className="w-5 h-5" />
+                  <h2 id="pwa-install-title" className="text-lg font-semibold">
+                    {isIOS ? 'Add to Home Screen' : `Install ${appConfig.short_name}`}
+                  </h2>
+                </div>
+                <p id="pwa-install-description" className="text-sm opacity-90">
+                  {isIOS
+                    ? 'Get quick access to the app from your home screen'
+                    : `Get ${appConfig.short_name} on your device for offline access`}
+                </p>
+              </div>
 
-      {/* Backdrop (optional) */}
-      <div
-        className="fixed inset-0 bg-black bg-opacity-20 z-40 animate-fade-in"
-        onClick={onDismiss}
-        aria-hidden="true"
-      />
+              {/* Content */}
+              <div className="px-6 py-4">
+                <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                  <li className="flex items-center gap-2">
+                    <Bell className="w-4 h-4 flex-shrink-0" style={{ color: primaryColor }} />
+                    Offline support
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Bell className="w-4 h-4 flex-shrink-0" style={{ color: primaryColor }} />
+                    App-like experience
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Bell className="w-4 h-4 flex-shrink-0" style={{ color: primaryColor }} />
+                    Push notifications
+                  </li>
+                </ul>
+              </div>
+
+              {/* Actions */}
+              <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800 flex gap-3">
+                <button
+                  onClick={handleDismiss}
+                  className={`
+                    flex-1 px-4 py-2 rounded-md font-medium transition-colors
+                    text-slate-700 dark:text-slate-300
+                    hover:bg-slate-200 dark:hover:bg-slate-700
+                    focus:outline-none focus:ring-2 focus:ring-offset-2
+                  `}
+                  style={{ outlineColor: primaryColor }}
+                  aria-label="Dismiss installation prompt"
+                >
+                  Not now
+                </button>
+                <button
+                  onClick={isIOS ? handleIOSInstall : handleInstall}
+                  className={`
+                    flex-1 px-4 py-2 rounded-md font-medium transition-all
+                    text-white
+                    focus:outline-none focus:ring-2 focus:ring-offset-2
+                    active:scale-95
+                  `}
+                  style={{
+                    backgroundColor: primaryColor,
+                    outlineColor: primaryColor,
+                  }}
+                  aria-label={isIOS ? 'Add to Home Screen' : 'Install app'}
+                >
+                  {isIOS ? 'Add' : 'Install'}
+                </button>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={handleDismiss}
+                className={`
+                  absolute top-3 right-3
+                  p-1 rounded-md text-slate-400 hover:text-slate-600
+                  dark:hover:text-slate-300 transition-colors
+                  focus:outline-none focus:ring-2 focus:ring-offset-2
+                `}
+                style={{ outlineColor: primaryColor }}
+                aria-label="Close installation prompt"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </>
-  );
-}
-
-function PWABadge() {
-  return (
-    <div
-      className={`
-        fixed bottom-24 right-4 z-50
-        w-12 h-12 rounded-full
-        bg-blue-500 text-white
-        flex items-center justify-center
-        shadow-lg cursor-pointer
-        animate-pulse hover:animate-none hover:scale-110
-        transition-transform
-      `}
-      role="img"
-      aria-label="PWA installation available"
-      title="Install app"
-    >
-      <Download className="w-6 h-6" />
-    </div>
   );
 }
