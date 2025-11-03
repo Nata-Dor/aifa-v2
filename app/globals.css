@@ -1,8 +1,9 @@
+/* globals.css */
 @import "tailwindcss";
 @import "tw-animate-css";
 
 /* Dark variant respects html[data-theme="dark"] (и .dark как fallback) */
-@custom-variant dark (&:where(html[data-theme="dark"], .dark, html[data-theme="dark"] * , .dark * ));
+@custom-variant dark (&:where(html[data-theme="dark"], .dark, html[data-theme="dark"] *, .dark *));
 
 /* Tailwind v4 mapping of CSS vars to tokens */
 @theme inline {
@@ -77,6 +78,7 @@
 
   /* destructive keep red-ish for clarity */
   --destructive: oklch(0.57 0.24 27.3);
+  --destructive-foreground: oklch(0.985 0 0);
 
   /* charts — harmonious violet/fuchsia/indigo set */
   --chart-1: oklch(0.66 0.24 290);  /* violet */
@@ -118,6 +120,7 @@
     --accent-foreground: oklch(0.985 0 0);
 
     --destructive: oklch(0.70 0.19 22.2);
+    --destructive-foreground: oklch(0.985 0 0);
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
     --ring: oklch(0.62 0.05 290);
@@ -140,48 +143,47 @@
 }
 
 /* Explicit dark override via data-theme="dark" */
-@layer theme {
-  html[data-theme="dark"] {
-    color-scheme: dark;
+html[data-theme="dark"] {
+  color-scheme: dark;
 
-    --background: oklch(0.15 0.015 290);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.20 0.02 290);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.20 0.02 290);
-    --popover-foreground: oklch(0.985 0 0);
+  --background: oklch(0.15 0.015 290);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.20 0.02 290);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.20 0.02 290);
+  --popover-foreground: oklch(0.985 0 0);
 
-    --primary: oklch(0.74 0.18 290);
-    --primary-foreground: oklch(0.16 0.02 290);
+  --primary: oklch(0.74 0.18 290);
+  --primary-foreground: oklch(0.16 0.02 290);
 
-    --secondary: oklch(0.28 0.015 290);
-    --secondary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.28 0.015 290);
+  --secondary-foreground: oklch(0.985 0 0);
 
-    --muted: oklch(0.26 0.01 290);
-    --muted-foreground: oklch(0.70 0.015 290);
-    --accent: oklch(0.26 0.01 290);
-    --accent-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.26 0.01 290);
+  --muted-foreground: oklch(0.70 0.015 290);
+  --accent: oklch(0.26 0.01 290);
+  --accent-foreground: oklch(0.985 0 0);
 
-    --destructive: oklch(0.70 0.19 22.2);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.62 0.05 290);
+  --destructive: oklch(0.70 0.19 22.2);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.62 0.05 290);
 
-    --chart-1: oklch(0.62 0.23 290);
-    --chart-2: oklch(0.70 0.20 320);
-    --chart-3: oklch(0.68 0.19 260);
-    --chart-4: oklch(0.64 0.22 305);
-    --chart-5: oklch(0.66 0.21 275);
+  --chart-1: oklch(0.62 0.23 290);
+  --chart-2: oklch(0.70 0.20 320);
+  --chart-3: oklch(0.68 0.19 260);
+  --chart-4: oklch(0.64 0.22 305);
+  --chart-5: oklch(0.66 0.21 275);
 
-    --sidebar: oklch(0.20 0.02 290);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.62 0.23 290);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.26 0.01 290);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.62 0.05 290);
-  }
+  --sidebar: oklch(0.20 0.02 290);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.62 0.23 290);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.26 0.01 290);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.62 0.05 290);
 }
 
 /* Baseline utilities */
@@ -189,7 +191,17 @@
   * {
     @apply border-border outline-ring/50;
   }
+  
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Fix for overscroll utility */
+  .overscroll-x-none {
+    overscroll-behavior-x: none;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 }

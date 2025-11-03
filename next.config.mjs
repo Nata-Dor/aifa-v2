@@ -1,10 +1,11 @@
-// next.config.mjs - БЕЗ многоязычности
-import withPWAInit from 'next-pwa'
+// aifa-v2/next.config.mjs
+import withPWAInit from 'next-pwa';
 
-const isDev = process.env.NODE_ENV === 'development'
-const isVercel = process.env.VERCEL === '1'
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aifa.dev'
+const isDev = process.env.NODE_ENV === 'development';
+const isVercel = process.env.VERCEL === '1';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aifa.dev';
 
+// PWA Configuration с оптимизированными настройками Workbox
 const withPWA = withPWAInit({
   dest: 'public',
   register: true,
@@ -44,6 +45,15 @@ const withPWA = withPWAInit({
         cacheableResponse: {
           statuses: [0, 200],
         },
+        plugins: [
+          {
+            handlerDidError: async () => {
+              return new Response('Offline - Font unavailable', {
+                status: 503,
+              });
+            },
+          },
+        ],
       },
     },
     {
@@ -132,15 +142,19 @@ const withPWA = withPWAInit({
       },
     },
   ],
-})
+});
 
+/**
+ * Content Security Policy - Расслаблены ограничения для встроенных скриптов
+ * Разрешены встроенные стили и скрипты для удобства разработки
+ */
 const cspHeader = [
   "default-src 'self'",
-  "script-src 'self' 'wasm-unsafe-eval' www.google-analytics.com www.googletagmanager.com cdn.jsdelivr.net",
   "style-src 'self' 'unsafe-inline' fonts.googleapis.com",
   "font-src 'self' fonts.gstatic.com data:",
   "img-src 'self' data: https: blob:",
   "media-src 'self' https: blob:",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' www.google-analytics.com www.googletagmanager.com",
   "connect-src 'self' https: wss: www.google-analytics.com www.googletagmanager.com api.stripe.com",
   "frame-src 'self' www.stripe.com js.stripe.com",
   "worker-src 'self' blob:",
@@ -149,7 +163,7 @@ const cspHeader = [
   "form-action 'self'",
   "frame-ancestors 'self'",
   "upgrade-insecure-requests",
-].join('; ')
+].join('; ');
 
 const securityHeaders = [
   {
@@ -184,7 +198,7 @@ const securityHeaders = [
     key: 'Expect-CT',
     value: 'max-age=86400, enforce',
   },
-]
+];
 
 const cacheHeaders = [
   {
@@ -284,9 +298,10 @@ const cacheHeaders = [
       },
     ],
   },
-]
+];
 
 export default withPWA({
+  // Основные параметры оптимизации
   reactStrictMode: true,
   swcMinify: true,
   compress: true,
@@ -294,6 +309,7 @@ export default withPWA({
   productionBrowserSourceMaps: false,
   pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
 
+  // Оптимизация изображений
   images: {
     remotePatterns: [
       {
@@ -323,15 +339,25 @@ export default withPWA({
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 31536000,
     dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'self'; sandbox;",
+    contentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline'; sandbox;",
   },
 
+  // Headers с безопасностью и кэшированием
   headers: async () => [
     {
       source: '/:path*',
       headers: securityHeaders,
     },
     ...cacheHeaders,
+    {
+      source: '/sitemap.xml',
+      headers: [
+        {
+          key: 'Content-Type',
+          value: 'application/xml; charset=utf-8',
+        },
+      ],
+    },
     {
       source: '/feed.xml',
       headers: [
@@ -343,15 +369,21 @@ export default withPWA({
     },
   ],
 
-  // ✅ ПРАВИЛЬНЫЕ редиректы БЕЗ конфликтов
+  // Переадресации
   redirects: async () => [
     {
       source: '/manifest.json',
       destination: '/manifest.webmanifest',
       permanent: true,
     },
+    {
+      source: '/en/:path*',
+      destination: '/:path*',
+      permanent: false,
+    },
   ],
 
+  // Переписывание для API
   rewrites: async () => ({
     beforeFiles: [
       {
@@ -361,9 +393,10 @@ export default withPWA({
     ],
   }),
 
+  // Оптимизация Webpack
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      config.optimization.runtimeChunk = 'single'
+      config.optimization.runtimeChunk = 'single';
       config.optimization.splitChunks = {
         chunks: 'all',
         cacheGroups: {
@@ -384,16 +417,18 @@ export default withPWA({
             enforce: true,
           },
         },
-      }
+      };
     }
-    return config
+    return config;
   },
 
+  // Переменные окружения
   env: {
     NEXT_PUBLIC_SITE_URL: siteUrl,
     NEXT_PUBLIC_ENVIRONMENT: process.env.NEXT_PUBLIC_ENVIRONMENT || 'development',
   },
 
+  // Экспериментальные функции для лучшей производительности
   experimental: {
     optimizePackageImports: [
       'lucide-react',
@@ -411,33 +446,37 @@ export default withPWA({
     },
   },
 
+  // TypeScript strict mode
   typescript: {
     strict: true,
     tsconfigPath: './tsconfig.json',
   },
 
+  // ESLint конфигурация
   eslint: {
     dirs: ['app', 'lib', 'components', 'utils', 'config'],
     ignoreDuringBuilds: false,
   },
 
+  // On-demand entries для лучшего опыта разработки
   onDemandEntries: {
     maxInactiveAge: 60 * 1000,
     pagesBufferLength: 5,
   },
 
-  // ❌ УДАЛЕНО:
-  // i18n конфигурация
-  // Редиректы на /en/
-
+  // Конфигурация trailing slashes
   trailingSlash: false,
+
+  // Генерация ETag
   generateEtags: true,
 
+  // Vercel-специфическая конфигурация
   ...(isVercel && {
     swcMinify: true,
     productionBrowserSourceMaps: false,
   }),
 
+  // Оптимизация сборки
   staticPageGenerationTimeout: 120,
   outputFileTracing: true,
-})
+});

@@ -97,7 +97,7 @@ export default function RootLayout({
         <meta name="msapplication-config" content="/browserconfig.xml" />
         <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
 
-        {/* Service Worker Registration - Static file approach */}
+        {/* Service Worker Registration */}
         <Script src="/register-sw.js" strategy="beforeInteractive" async={false} />
       </head>
       <body
