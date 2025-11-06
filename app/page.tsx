@@ -896,10 +896,17 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="pb-4 text-center text-xs text-muted-foreground">
-          © {CURRENT_YEAR} {appConfig.short_name}. All rights reserved.
-        </footer>
+       <footer className="pb-4 text-center text-xs text-muted-foreground">
+  © {CURRENT_YEAR} {appConfig.short_name}. All rights reserved.{" "}
+  <Link
+    href="https://aifa.dev"
+    target="_blank"
+    rel="noreferrer"
+    className="font-medium underline underline-offset-4 hover:text-foreground transition-colors"
+  >
+    {appConfig.short_name}
+  </Link>
+</footer>
       </main>
     </>
   );
