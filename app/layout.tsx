@@ -5,6 +5,9 @@ import Script from 'next/script'
 import { constructMetadata } from '@/lib/construct-metadata'
 import { appConfig } from '@/config/app-config'
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt'
+import { GoogleAnalytics } from '@next/third-parties/google'
+
+
 import './styles/globals.css'
 
 
@@ -138,6 +141,11 @@ export default function RootLayout({
             </p>
           </div>
         </noscript>
+         {process.env.NODE_ENV === "production" && (
+          <GoogleAnalytics
+            gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID!}
+          />
+        )}
       </body>
     </html>
   )
