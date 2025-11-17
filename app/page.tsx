@@ -634,8 +634,8 @@ export default async function Home() {
 
         {/* Features Section (all links -> "/") */}
         <section aria-labelledby="features-title" className="space-y-6">
-          <h2 id="features-title" className="text-xl font-semibold text-foreground">
-            What you get out of the box
+          <h2 id="deepdive-title" className="text-xl font-semibold text-foreground">
+What you get out of the box
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Feature
@@ -754,7 +754,8 @@ export default async function Home() {
         </section>
 
 <section className="mb-12" aria-labelledby="top-features-section">
-          <h2 id="top-features-section" className="text-2xl font-bold tracking-tight mb-2">
+         <h2 id="top-features-section" className="text-2xl font-bold tracking-tight mb-2 text-foreground">
+
             Lighthouse Performance Highlights
           </h2>
           <Card className='p-4'>

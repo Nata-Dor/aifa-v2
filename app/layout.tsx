@@ -100,7 +100,7 @@ export default function RootLayout({
 
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overscroll-x-none`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased overscroll-x-none bg-white`}
       >
         {/* JSON-LD schemas for SEO */}
         <Script
