@@ -1,9 +1,9 @@
+//components/pwa-install-prompt.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { X, Download, Bell } from 'lucide-react';
 import { appConfig } from '@/config/app-config';
-import { getCSSVariable } from '@/lib/theme-colors';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -25,7 +25,7 @@ export function PWAInstallPrompt({ dismissDuration = 86400000 }: PWAInstallPromp
 
   useEffect(() => {
     // Set primary color from CSS variables
-    const color = getCSSVariable('primary');
+    const color = 'primary' 
     setPrimaryColor(color);
 
     // Detect platform
@@ -141,7 +141,7 @@ export function PWAInstallPrompt({ dismissDuration = 86400000 }: PWAInstallPromp
         <button
           onClick={handleBadgeClick}
           className={`
-            fixed bottom-6 right-6 z-40
+            fixed bottom-10 right-6 z-40
             w-14 h-14 rounded-full
             flex items-center justify-center
             shadow-lg cursor-pointer

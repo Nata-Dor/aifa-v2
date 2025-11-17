@@ -15,12 +15,15 @@ import Image from 'next/image';
 import { constructMetadata } from '@/lib/construct-metadata';
 import { generateWebSiteSchema, generateFAQSchema } from '@/lib/seo-generators';
 import { appConfig, getHomePageIllustration } from '@/config/app-config';
+import { AifaRoadmap } from '@/components/aifa-roadmap';
+import { AIFA_ROADMAP_ITEMS } from '@/config/pages-config/aifa-roadmap-data';
+import { Card } from '@/components/ui/card';
 
 // SEO: Generate metadata for homepage
 export const metadata: Metadata = constructMetadata({
-title: 'SEO-First PWA Starter Kit with PWA — Next.js 15 + React 19',
-description:
-  'Production-ready Next.js starter with battle-tested SEO infrastructure, Progressive Web App core, and env-driven configuration. Ship search-optimized, installable apps instantly.',
+  title: 'SEO-First PWA Starter Kit with PWA — Next.js 15 + React 19',
+  description:
+    'Production-ready Next.js starter with battle-tested SEO infrastructure, Progressive Web App core, and env-driven configuration. Ship search-optimized, installable apps instantly.',
   pathname: '/',
   contentType: 'website',
 });
@@ -112,151 +115,151 @@ const LONG_SECTIONS: Array<{
   href: string;
   paragraphs: string[];
 }> = [
-  {
-    id: 'seo-kernel',
-    title: 'SEO Kernel',
-    href: '/',
-    paragraphs: [
-      'Search engines reward sites that combine clear structure with rich semantics: canonical URLs, hreflang alternates, robust robots rules, and consistent title templates.',
-      'This starter unifies those pieces behind a single metadata pipeline, so every route ships with correct Open Graph, Twitter cards, and optional verification tokens.',
-    ],
-  },
-  {
-    id: 'pwa-core',
-    title: 'PWA Core',
-    href: '/',
-    paragraphs: [
-      'A web app manifest, install prompts, and a service worker transform a site into an installable, resilient experience that users can trust.',
-      'Offline fallbacks and well-scoped caching policies keep pages usable under flaky networks without risking stale, unbounded caches.',
-    ],
-  },
-  {
-    id: 'metadata-system',
-    title: 'Metadata System',
-    href: '/',
-    paragraphs: [
-      'Centralized helpers compose titles, descriptions, icons, and canonical URLs from env-driven branding and defaults.',
-      'By constraining variations and exposing safe knobs, teams avoid "meta drift" and keep signals consistent across the entire domain.',
-    ],
-  },
-  {
-    id: 'json-ld',
-    title: 'JSON‑LD Schemas',
-    href: '/',
-    paragraphs: [
-      'Schema.org JSON‑LD elevates meaning: WebSite, Organization, Article, Product, FAQ, and Breadcrumbs map your content to entities search engines understand.',
-      'Builders ensure valid structure and URLs, while keeping room for per-page overrides and future schema growth.',
-    ],
-  },
-  {
-    id: 'sitemap',
-    title: 'Sitemap',
-    href: '/',
-    paragraphs: [
-      'A living sitemap lists static and dynamic routes with lastModified, priority, and localized alternates.',
-      'It scales with content sources, respects 50k URL limits, and guards against broken alternates across locales.',
-    ],
-  },
-  {
-    id: 'robots',
-    title: 'Robots',
-    href: '/',
-    paragraphs: [
-      'Granular agents policies let you tune access for traditional crawlers and modern AI bots.',
-      'Toggle index/follow and disallow sensitive paths while keeping discovery open for marketing-facing routes.',
-    ],
-  },
-  {
-    id: 'manifest',
-    title: 'Web App Manifest',
-    href: '/',
-    paragraphs: [
-      'Provide icons in multiple sizes, including maskable variants, plus theme and background colors for a crisp install experience.',
-      'Shortcuts and screenshots improve UX on add-to-home-screen and align the app with brand guidelines.',
-    ],
-  },
-  {
-    id: 'service-worker',
-    title: 'Service Worker',
-    href: '/',
-    paragraphs: [
-      'Lifecycle hooks (install/activate) wire up caches and cleanup, while fetch handlers select per-asset strategies.',
-      'Messaging hooks, background sync, and notification clicks enable progressive enhancements without breaking core delivery.',
-    ],
-  },
-  {
-    id: 'caching',
-    title: 'Caching',
-    href: '/',
-    paragraphs: [
-      'Pair HTTP cache headers with runtime strategies: Cache‑First for static assets, Network‑First for pages and APIs.',
-      'Explicit fallbacks prevent opaque failures and let you manage staleness, entry limits, and expiration windows.',
-    ],
-  },
-  {
-    id: 'images-og',
-    title: 'Images & Open Graph',
-    href: '/',
-    paragraphs: [
-      'Ship AVIF/WebP, tune sizes, and use blurDataURL placeholders for fast, stable layouts.',
-      'Open Graph images match 1200×630 conventions with text‑safe padding, while icons include Apple touch and maskable variants.',
-    ],
-  },
-  {
-    id: 'i18n',
-    title: 'Internationalization',
-    href: '/',
-    paragraphs: [
-      'Alternates per locale and a single canonical base avoid duplicate content and regional cannibalization.',
-      'Language defaults, explicit URL building, and sitemap alternates keep bots and users aligned.',
-    ],
-  },
-  {
-    id: 'security',
-    title: 'Security Headers',
-    href: '/',
-    paragraphs: [
-      'Harden pages with CSP, HSTS, X‑Frame‑Options, Referrer‑Policy, and a sensible Permissions‑Policy.',
-      'Strict defaults reduce attack surface while allowing the assets and endpoints your app needs.',
-    ],
-  },
-  {
-    id: 'performance',
-    title: 'Performance',
-    href: '/',
-    paragraphs: [
-      'Minification, compression, image formats, and static generation baselines deliver consistently snappy pages.',
-      'Target perfect Lighthouse while keeping SSR-first HTML meaningful when JavaScript is disabled.',
-    ],
-  },
-  {
-    id: 'accessibility',
-    title: 'Accessibility',
-    href: '/',
-    paragraphs: [
-      'Core content remains available with JavaScript disabled via semantic HTML and <noscript> fallbacks.',
-      'Color‑scheme and focus states follow WCAG‑aligned patterns to keep UX inclusive by default.',
-    ],
-  },
-  {
-    id: 'analytics',
-    title: 'Analytics & Verification',
-    href: '/',
-    paragraphs: [
-      'Verification tokens live in metadata only when provided, keeping noise out of production builds.',
-      'Hook points exist to integrate analytics without leaking PII or breaking CSP rules.',
-    ],
-  },
-  {
-    id: 'content-architecture',
-    title: 'Content Architecture',
-    href: '/',
-    paragraphs: [
-      'Structure beats volume: internal linking, templates, and consistent types outperform raw content generation.',
-      'Treat documentation as product—indexable, scannable, and kept fresh by design.',
-    ],
-  },
-];
+    {
+      id: 'seo-kernel',
+      title: 'SEO Kernel',
+      href: '/',
+      paragraphs: [
+        'Search engines reward sites that combine clear structure with rich semantics: canonical URLs, hreflang alternates, robust robots rules, and consistent title templates.',
+        'This starter unifies those pieces behind a single metadata pipeline, so every route ships with correct Open Graph, Twitter cards, and optional verification tokens.',
+      ],
+    },
+    {
+      id: 'pwa-core',
+      title: 'PWA Core',
+      href: '/',
+      paragraphs: [
+        'A web app manifest, install prompts, and a service worker transform a site into an installable, resilient experience that users can trust.',
+        'Offline fallbacks and well-scoped caching policies keep pages usable under flaky networks without risking stale, unbounded caches.',
+      ],
+    },
+    {
+      id: 'metadata-system',
+      title: 'Metadata System',
+      href: '/',
+      paragraphs: [
+        'Centralized helpers compose titles, descriptions, icons, and canonical URLs from env-driven branding and defaults.',
+        'By constraining variations and exposing safe knobs, teams avoid "meta drift" and keep signals consistent across the entire domain.',
+      ],
+    },
+    {
+      id: 'json-ld',
+      title: 'JSON‑LD Schemas',
+      href: '/',
+      paragraphs: [
+        'Schema.org JSON‑LD elevates meaning: WebSite, Organization, Article, Product, FAQ, and Breadcrumbs map your content to entities search engines understand.',
+        'Builders ensure valid structure and URLs, while keeping room for per-page overrides and future schema growth.',
+      ],
+    },
+    {
+      id: 'sitemap',
+      title: 'Sitemap',
+      href: '/',
+      paragraphs: [
+        'A living sitemap lists static and dynamic routes with lastModified, priority, and localized alternates.',
+        'It scales with content sources, respects 50k URL limits, and guards against broken alternates across locales.',
+      ],
+    },
+    {
+      id: 'robots',
+      title: 'Robots',
+      href: '/',
+      paragraphs: [
+        'Granular agents policies let you tune access for traditional crawlers and modern AI bots.',
+        'Toggle index/follow and disallow sensitive paths while keeping discovery open for marketing-facing routes.',
+      ],
+    },
+    {
+      id: 'manifest',
+      title: 'Web App Manifest',
+      href: '/',
+      paragraphs: [
+        'Provide icons in multiple sizes, including maskable variants, plus theme and background colors for a crisp install experience.',
+        'Shortcuts and screenshots improve UX on add-to-home-screen and align the app with brand guidelines.',
+      ],
+    },
+    {
+      id: 'service-worker',
+      title: 'Service Worker',
+      href: '/',
+      paragraphs: [
+        'Lifecycle hooks (install/activate) wire up caches and cleanup, while fetch handlers select per-asset strategies.',
+        'Messaging hooks, background sync, and notification clicks enable progressive enhancements without breaking core delivery.',
+      ],
+    },
+    {
+      id: 'caching',
+      title: 'Caching',
+      href: '/',
+      paragraphs: [
+        'Pair HTTP cache headers with runtime strategies: Cache‑First for static assets, Network‑First for pages and APIs.',
+        'Explicit fallbacks prevent opaque failures and let you manage staleness, entry limits, and expiration windows.',
+      ],
+    },
+    {
+      id: 'images-og',
+      title: 'Images & Open Graph',
+      href: '/',
+      paragraphs: [
+        'Ship AVIF/WebP, tune sizes, and use blurDataURL placeholders for fast, stable layouts.',
+        'Open Graph images match 1200×630 conventions with text‑safe padding, while icons include Apple touch and maskable variants.',
+      ],
+    },
+    {
+      id: 'i18n',
+      title: 'Internationalization',
+      href: '/',
+      paragraphs: [
+        'Alternates per locale and a single canonical base avoid duplicate content and regional cannibalization.',
+        'Language defaults, explicit URL building, and sitemap alternates keep bots and users aligned.',
+      ],
+    },
+    {
+      id: 'security',
+      title: 'Security Headers',
+      href: '/',
+      paragraphs: [
+        'Harden pages with CSP, HSTS, X‑Frame‑Options, Referrer‑Policy, and a sensible Permissions‑Policy.',
+        'Strict defaults reduce attack surface while allowing the assets and endpoints your app needs.',
+      ],
+    },
+    {
+      id: 'performance',
+      title: 'Performance',
+      href: '/',
+      paragraphs: [
+        'Minification, compression, image formats, and static generation baselines deliver consistently snappy pages.',
+        'Target perfect Lighthouse while keeping SSR-first HTML meaningful when JavaScript is disabled.',
+      ],
+    },
+    {
+      id: 'accessibility',
+      title: 'Accessibility',
+      href: '/',
+      paragraphs: [
+        'Core content remains available with JavaScript disabled via semantic HTML and <noscript> fallbacks.',
+        'Color‑scheme and focus states follow WCAG‑aligned patterns to keep UX inclusive by default.',
+      ],
+    },
+    {
+      id: 'analytics',
+      title: 'Analytics & Verification',
+      href: '/',
+      paragraphs: [
+        'Verification tokens live in metadata only when provided, keeping noise out of production builds.',
+        'Hook points exist to integrate analytics without leaking PII or breaking CSP rules.',
+      ],
+    },
+    {
+      id: 'content-architecture',
+      title: 'Content Architecture',
+      href: '/',
+      paragraphs: [
+        'Structure beats volume: internal linking, templates, and consistent types outperform raw content generation.',
+        'Treat documentation as product—indexable, scannable, and kept fresh by design.',
+      ],
+    },
+  ];
 
 const CORE_FEATURES_FAQS = [
   // Sitemap Feature
@@ -376,10 +379,10 @@ const CORE_FEATURES_FAQS = [
       'An install prompt is a browser dialog offering to add your app to the home screen. The starter detects when users are likely to install and shows a custom prompt, dramatically increasing installation rates.',
   },
   {
-  question: 'Does the install prompt work on all browsers?',
-  answer:
-    'Install prompts are native on Android Chrome and desktop Edge/Chrome. On iOS Safari, the component shows step-by-step instructions via alert, as iOS does not support the native beforeinstallprompt API. Unsupported browsers gracefully degrade.',
-},
+    question: 'Does the install prompt work on all browsers?',
+    answer:
+      'Install prompts are native on Android Chrome and desktop Edge/Chrome. On iOS Safari, the component shows step-by-step instructions via alert, as iOS does not support the native beforeinstallprompt API. Unsupported browsers gracefully degrade.',
+  },
   {
     question: 'Can I customize the install prompt appearance?',
     answer:
@@ -393,15 +396,15 @@ const CORE_FEATURES_FAQS = [
 
   // Service Worker Feature
   {
-  question: 'What caching strategies does the Service Worker use?',
-  answer:
-    'Cache-First for static assets (images, fonts, CSS, JS) — serve from cache, fallback to network. Network-First for pages and APIs — try network first, fallback to cache. Custom strategies implemented in public/sw.js without external dependencies.',
-},
-{
-  question: 'Does the Service Worker support push notifications?',
-  answer:
-    'Yes. The Service Worker includes handlers for push events and notification clicks. Configure push subscriptions via Web Push API. The starter provides boilerplate code in public/sw.js, but server-side push integration requires additional setup.',
-},
+    question: 'What caching strategies does the Service Worker use?',
+    answer:
+      'Cache-First for static assets (images, fonts, CSS, JS) — serve from cache, fallback to network. Network-First for pages and APIs — try network first, fallback to cache. Custom strategies implemented in public/sw.js without external dependencies.',
+  },
+  {
+    question: 'Does the Service Worker support push notifications?',
+    answer:
+      'Yes. The Service Worker includes handlers for push events and notification clicks. Configure push subscriptions via Web Push API. The starter provides boilerplate code in public/sw.js, but server-side push integration requires additional setup.',
+  },
 
   {
     question: 'How does the Service Worker handle offline?',
@@ -502,10 +505,10 @@ const CORE_FEATURES_FAQS = [
       'Static: blogs, landing pages, docs, products (content changes infrequently). Server-rendering: dashboards, user-specific content, real-time data. Combine both: static homepage + SSR for dynamic sections.',
   },
   {
-  question: 'How do I regenerate a page when content changes?',
-  answer:
-    'Use ISR with revalidate export (e.g., export const revalidate = 3600). For on-demand revalidation, add Server Actions with revalidatePath("/blog") or revalidateTag("blog"). This requires additional setup beyond the starter.',
-},
+    question: 'How do I regenerate a page when content changes?',
+    answer:
+      'Use ISR with revalidate export (e.g., export const revalidate = 3600). For on-demand revalidation, add Server Actions with revalidatePath("/blog") or revalidateTag("blog"). This requires additional setup beyond the starter.',
+  },
 
 
   // Security Headers Feature
@@ -550,13 +553,13 @@ export default async function Home() {
       />
 
       <Script
-  id="core-features-faq-schema"
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify(coreFeaturesSchema),
-  }}
-  strategy="beforeInteractive"
-/>
+        id="core-features-faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(coreFeaturesSchema),
+        }}
+        strategy="beforeInteractive"
+      />
 
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 py-12 sm:py-16">
         {/* Hero Section (unchanged) */}
@@ -750,7 +753,15 @@ export default async function Home() {
           </div>
         </section>
 
-               {/* Explore Features - Core Components */}
+<section className="mb-12" aria-labelledby="top-features-section">
+          <h2 id="top-features-section" className="text-2xl font-bold tracking-tight mb-2">
+            Lighthouse Performance Highlights
+          </h2>
+          <Card className='p-4'>
+          <Image src={"/images/pic1.png"} alt="images/seo-research-aifa" width={800} height={450} priority={false} className='w-full' />
+        </Card></section>
+
+        {/* Explore Features - Core Components */}
         <section aria-labelledby="explore-title" className="space-y-6">
           <h2 id="explore-title" className="text-xl font-semibold text-foreground">
             Core features
@@ -854,19 +865,19 @@ export default async function Home() {
           </nav>
         </section>
 
+        <AifaRoadmap items={AIFA_ROADMAP_ITEMS} />
 
-      
 
         <section aria-labelledby="core-faq-title" className="space-y-6">
-  <h2 id="core-faq-title" className="text-xl font-semibold text-foreground">
-    Core Features FAQ
-  </h2>
-  <div className="grid gap-3 sm:grid-cols-2">
-    {CORE_FEATURES_FAQS.map((f) => (
-      <Hint key={f.question} title={f.question} lines={[f.answer]} />
-    ))}
-  </div>
-</section>
+          <h2 id="core-faq-title" className="text-xl font-semibold text-foreground">
+            Core Features FAQ
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {CORE_FEATURES_FAQS.map((f) => (
+              <Hint key={f.question} title={f.question} lines={[f.answer]} />
+            ))}
+          </div>
+        </section>
 
         {/* CTA Section (all links -> "/") */}
         <section
@@ -896,17 +907,17 @@ export default async function Home() {
           </div>
         </section>
 
-       <footer className="pb-4 text-center text-xs text-muted-foreground">
-  © {CURRENT_YEAR} {appConfig.short_name}. All rights reserved.{" "}
-  <Link
-    href="https://aifa.dev"
-    target="_blank"
-    rel="noreferrer"
-    className="font-medium underline underline-offset-4 hover:text-foreground transition-colors"
-  >
-    {appConfig.short_name}
-  </Link>
-</footer>
+        <footer className="pb-4 text-center text-xs text-muted-foreground">
+          © {CURRENT_YEAR} {appConfig.short_name}. All rights reserved.{" "}
+          <Link
+            href="https://aifa.dev"
+            target="_blank"
+            rel="noreferrer"
+            className="font-medium underline underline-offset-4 hover:text-foreground transition-colors"
+          >
+            {appConfig.short_name}
+          </Link>
+        </footer>
       </main>
     </>
   );
